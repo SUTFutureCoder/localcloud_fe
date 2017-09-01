@@ -1,0 +1,86 @@
+[
+  {
+    "file": "css/index.css",
+    "hash": "e46d9a1c456a9c913ca10f3c16d50000"
+  },
+  {
+    "file": "img/logo.png",
+    "hash": "7e34c95ac701f8cd9f793586b9df2156"
+  },
+  {
+    "file": "index.html",
+    "hash": "4cf56a8072b0e675a21f7f70c070f7f4"
+  },
+  {
+    "file": "js/index.js",
+    "hash": "b144c071205225b243caacc5b550f592"
+  },
+  {
+    "file": "static/css/app.a03f77c0f11edbb8f80c0c1c080bd788.css",
+    "hash": "1d8aad42354360140b4da2510a372850"
+  },
+  {
+    "file": "static/css/app.a03f77c0f11edbb8f80c0c1c080bd788.css.map",
+    "hash": "fdd96e37586d88a647529f86bcfd116c"
+  },
+  {
+    "file": "static/fonts/material-icons/codepoints",
+    "hash": "861b6ac15aeed39b13aa390a84045082"
+  },
+  {
+    "file": "static/fonts/material-icons/material-icons.css",
+    "hash": "c5941eed2e20a509114128aab1e96edf"
+  },
+  {
+    "file": "static/fonts/material-icons/MaterialIcons-Regular.eot",
+    "hash": "e79bfd88537def476913f3ed52f4f4b3"
+  },
+  {
+    "file": "static/fonts/material-icons/MaterialIcons-Regular.ijmap",
+    "hash": "ed6a98d002bc0b535dd8618f3ae05fe7"
+  },
+  {
+    "file": "static/fonts/material-icons/MaterialIcons-Regular.svg",
+    "hash": "a1adea65594c502f9d9428f13ae210e1"
+  },
+  {
+    "file": "static/fonts/material-icons/MaterialIcons-Regular.ttf",
+    "hash": "a37b0c01c0baf1888ca812cc0508f6e2"
+  },
+  {
+    "file": "static/fonts/material-icons/MaterialIcons-Regular.woff",
+    "hash": "012cf6a10129e2275d79d6adac7f3b02"
+  },
+  {
+    "file": "static/fonts/material-icons/MaterialIcons-Regular.woff2",
+    "hash": "570eb83859dc23dd0eec423a49e147fe"
+  },
+  {
+    "file": "static/fonts/material-icons/README.md",
+    "hash": "74139811f0c508b3cbd5ea285c643950"
+  },
+  {
+    "file": "static/js/app.389809f7f26f1d96c97b.js",
+    "hash": "1b63bd8b742102ceebc8b8d61f523a55"
+  },
+  {
+    "file": "static/js/app.389809f7f26f1d96c97b.js.map",
+    "hash": "73be00fc78f0bb6c47429e1f8fa383d1"
+  },
+  {
+    "file": "static/js/manifest.cab62f53a78ae62b2ee0.js",
+    "hash": "880a7068386e652cde7fc7a1e8393b8c"
+  },
+  {
+    "file": "static/js/manifest.cab62f53a78ae62b2ee0.js.map",
+    "hash": "798e7f0e3f523558a168e8f0fce193ad"
+  },
+  {
+    "file": "static/js/vendor.7139e70d2abaee105569.js",
+    "hash": "9dda5a54730705c5f95f3218b641e7c7"
+  },
+  {
+    "file": "static/js/vendor.7139e70d2abaee105569.js.map",
+    "hash": "ed5590bcd15a85d440113057b6256960"
+  }
+]

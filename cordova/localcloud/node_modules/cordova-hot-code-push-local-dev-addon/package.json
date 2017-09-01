@@ -1,0 +1,113 @@
+{
+  "_args": [
+    [
+      "cordova-hot-code-push-local-dev-addon",
+      "/var/www/html/xy-travelnotes-fe/cordova/xy-travelnotes"
+    ]
+  ],
+  "_cnpm_publish_time": 1475568606705,
+  "_from": "cordova-hot-code-push-local-dev-addon@latest",
+  "_hasShrinkwrap": false,
+  "_id": "cordova-hot-code-push-local-dev-addon@0.4.2",
+  "_inCache": true,
+  "_installable": true,
+  "_location": "/cordova-hot-code-push-local-dev-addon",
+  "_nodeVersion": "4.2.2",
+  "_npmOperationalInternal": {
+    "host": "packages-12-west.internal.npmjs.com",
+    "tmp": "tmp/cordova-hot-code-push-local-dev-addon-0.4.2.tgz_1475568604593_0.27653407002799213"
+  },
+  "_npmUser": {
+    "email": "praetoriax@gmail.com",
+    "name": "nikdem"
+  },
+  "_npmVersion": "2.14.7",
+  "_phantomChildren": {},
+  "_requested": {
+    "name": "cordova-hot-code-push-local-dev-addon",
+    "raw": "cordova-hot-code-push-local-dev-addon",
+    "rawSpec": "",
+    "scope": null,
+    "spec": "latest",
+    "type": "tag"
+  },
+  "_requiredBy": [
+    "/"
+  ],
+  "_resolved": "http://registry.npm.taobao.org/cordova-hot-code-push-local-dev-addon/download/cordova-hot-code-push-local-dev-addon-0.4.2.tgz",
+  "_shasum": "5705cc3bd5084d1aec60b781c3921f9534e2eb50",
+  "_shrinkwrap": null,
+  "_spec": "cordova-hot-code-push-local-dev-addon",
+  "_where": "/var/www/html/xy-travelnotes-fe/cordova/xy-travelnotes",
+  "author": {
+    "name": "Nikolay Demyankov for Nordnet Bank AB"
+  },
+  "bugs": {
+    "url": "https://github.com/nordnet/cordova-hot-code-push-local-dev-addon/issues"
+  },
+  "cordova": {
+    "id": "cordova-hot-code-push-local-dev-addon",
+    "platforms": [
+      "android",
+      "ios"
+    ]
+  },
+  "dependencies": {
+    "colors": "^1.1.2",
+    "simple-plist": "^0.1.4",
+    "xml2js": "^0.4.17"
+  },
+  "description": "Cordova plugin that add's local development feature to the Hot Code Push plugin",
+  "devDependencies": {},
+  "directories": {},
+  "dist": {
+    "noattachment": false,
+    "shasum": "5705cc3bd5084d1aec60b781c3921f9534e2eb50",
+    "size": 47287,
+    "tarball": "http://registry.npm.taobao.org/cordova-hot-code-push-local-dev-addon/download/cordova-hot-code-push-local-dev-addon-0.4.2.tgz"
+  },
+  "engines": [
+    {
+      "name": "cordova-ios",
+      "version": ">=3.8"
+    },
+    {
+      "name": "cordova-android",
+      "version": ">=4"
+    },
+    {
+      "name": "cordova-plugman",
+      "version": ">=4.2.0"
+    }
+  ],
+  "gitHead": "f353799ffcfae5d059922a345d0c729732625596",
+  "homepage": "https://github.com/nordnet/cordova-hot-code-push-local-dev-addon#readme",
+  "keywords": [
+    "code",
+    "cordova",
+    "cordova-android",
+    "cordova-ios",
+    "development",
+    "ecosystem:cordova",
+    "hot code push",
+    "local",
+    "update"
+  ],
+  "license": "MIT",
+  "maintainers": [
+    {
+      "name": "nikdem",
+      "email": "praetoriax@gmail.com"
+    }
+  ],
+  "name": "cordova-hot-code-push-local-dev-addon",
+  "optionalDependencies": {},
+  "publish_time": 1475568606705,
+  "readme": "ERROR: No README data found!",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/nordnet/cordova-hot-code-push-local-dev-addon.git"
+  },
+  "scripts": {},
+  "version": "0.4.2"
+}

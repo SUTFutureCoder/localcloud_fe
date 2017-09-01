@@ -1,0 +1,33 @@
+<?xml version='1.0' encoding='utf-8'?>
+<widget id="io.cordova.localcloud" version="1.0.0" xmlns="http://www.w3.org/ns/widgets" xmlns:cdv="http://cordova.apache.org/ns/1.0">
+    <feature name="Device">
+        <param name="browser-package" value="Device" />
+    </feature>
+    <feature name="BackgroundMode">
+        <param name="browser-package" value="BackgroundMode" />
+    </feature>
+    <feature name="Camera">
+        <param name="browser-package" value="Camera" />
+    </feature>
+    <name>本地云</name>
+    <description>
+		一款创始人花了一千块钱恢复移动硬盘数据为代价诞生的灵感。顺便一提：渣士顿一生黑
+    </description>
+    <author email="FutureCoder@aliyun.com" href="https://github.com/SUTFutureCoder/">
+        *Chen
+		bricks
+    </author>
+    <content src="index.html" />
+    <access origin="*" />
+    <access origin="file:///*" />
+    <allow-intent href="http://*/*" />
+    <allow-intent href="https://*/*" />
+    <allow-intent href="tel:*" />
+    <allow-intent href="sms:*" />
+    <allow-intent href="mailto:*" />
+    <allow-intent href="geo:*" />
+    <allow-navigation href="*" />
+    <preference name="loadUrlTimeoutValue" value="60000" />
+    <preference name="AndroidLaunchMode" value="standard" />
+    <preference name="AndroidPersistentFileLocation" value="Internal" />
+</widget>

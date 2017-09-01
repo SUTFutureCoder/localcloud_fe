@@ -1,0 +1,105 @@
+{
+  "_args": [
+    [
+      {
+        "raw": "wifiwizard",
+        "scope": null,
+        "escapedName": "wifiwizard",
+        "name": "wifiwizard",
+        "rawSpec": "",
+        "spec": "latest",
+        "type": "tag"
+      },
+      "/var/www/html/localcloud_fe/cordova/localcloud/node_modules"
+    ]
+  ],
+  "_cnpm_publish_time": 1446098949942,
+  "_from": "wifiwizard@latest",
+  "_hasShrinkwrap": false,
+  "_id": "wifiwizard@0.2.11",
+  "_inCache": true,
+  "_location": "/wifiwizard",
+  "_nodeVersion": "0.12.7",
+  "_npmUser": {
+    "name": "hoerresb",
+    "email": "brandonhoerres@gmail.com"
+  },
+  "_npmVersion": "2.11.3",
+  "_phantomChildren": {},
+  "_requested": {
+    "raw": "wifiwizard",
+    "scope": null,
+    "escapedName": "wifiwizard",
+    "name": "wifiwizard",
+    "rawSpec": "",
+    "spec": "latest",
+    "type": "tag"
+  },
+  "_requiredBy": [
+    "#USER",
+    "/"
+  ],
+  "_resolved": "http://registry.npm.taobao.org/wifiwizard/download/wifiwizard-0.2.11.tgz",
+  "_shasum": "ed2db47bc4ac621c12de1d6ef5948822e964df14",
+  "_shrinkwrap": null,
+  "_spec": "wifiwizard",
+  "_where": "/var/www/html/localcloud_fe/cordova/localcloud/node_modules",
+  "author": {
+    "name": "Matt Parsons"
+  },
+  "bugs": {
+    "url": "https://github.com/parsonsmatt/wifiwizard/issues"
+  },
+  "cordova": {
+    "id": "com.pylonproducts.wifiwizard",
+    "platforms": [
+      "android",
+      "ios"
+    ]
+  },
+  "dependencies": {},
+  "description": "This plugin allows Phonegap applications to manage Wifi connections.",
+  "devDependencies": {},
+  "directories": {},
+  "dist": {
+    "shasum": "ed2db47bc4ac621c12de1d6ef5948822e964df14",
+    "size": 13006,
+    "noattachment": false,
+    "tarball": "http://registry.npm.taobao.org/wifiwizard/download/wifiwizard-0.2.11.tgz"
+  },
+  "gitHead": "6a7701ebe2ec7e7bb176c63375d0c67a3de87972",
+  "homepage": "https://github.com/parsonsmatt/wifiwizard#readme",
+  "keywords": [
+    "phonegap",
+    "network",
+    "wifi",
+    "ecosystem:cordova",
+    "cordova-android",
+    "cordova-ios"
+  ],
+  "license": "Apache 2.0",
+  "maintainers": [
+    {
+      "name": "asmund1",
+      "email": "asmund@herikstad.net"
+    },
+    {
+      "name": "hoerresb",
+      "email": "brandonhoerres@gmail.com"
+    },
+    {
+      "name": "parsonsmatt",
+      "email": "parsonsmatt@gmail.com"
+    }
+  ],
+  "name": "wifiwizard",
+  "optionalDependencies": {},
+  "publish_time": 1446098949942,
+  "readme": "ERROR: No README data found!",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/parsonsmatt/wifiwizard.git"
+  },
+  "scripts": {},
+  "version": "0.2.11"
+}
