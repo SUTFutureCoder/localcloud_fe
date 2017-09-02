@@ -23,7 +23,8 @@
         "cordova-plugin-geolocation": "^2.4.3",
         "cordova-plugin-network-information": "^1.3.3",
         "cordova-plugin-whitelist": "^1.3.2",
-        "wifiwizard": "^0.2.11"
+        "wifiwizard": "^0.2.11",
+        "com.pylonproducts.wifiwizard": "~0.2.11"
     },
     "cordova": {
         "plugins": {

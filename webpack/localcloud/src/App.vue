@@ -1,15 +1,7 @@
 <template>
   <div id="app">
-    <div v-if="isReady">
-      <keep-alive><router-view></router-view></keep-alive>
-      <bottom id="bottom" v-if="showbottom"></bottom>
-    </div>
-    <div v-else>
-      <div id="loading">
-        <mu-row id="loading_pic"><mu-circular-progress :size="120" :strokeWidth="10"/></mu-row>
-        <mu-row id="loading_text"><p>本地云初始化中o(*≧▽≦)ツ</p></mu-row>
-      </div>
-    </div>
+    <keep-alive><router-view></router-view></keep-alive>
+    <bottom id="bottom" v-if="showbottom"></bottom>
   </div>
 </template>
 
@@ -17,23 +9,22 @@
 import Boot from './assets/Boot'
 import Bottom from './pages/common/Bottom'
 import Bus from './assets/EventBus'
+import * as RouterPath from './constants/RouterPaths'
 export default {
     name: 'app',
     data () {
         return {
             showbottom: true,   //是否显示底端按钮
-            isReady:    false,  //是否已经准备就绪
         }
     },
     mounted() {
         let vue = this
-        //进行初始化
-        Boot.main()
-
         //监听底部隐藏
         Bus.$on("showbottom", function (boolBottom) {
             vue['showbottom'] = boolBottom
         })
+        //进行初始化
+        Boot.main(vue)
     },
     methods: {
     },
@@ -60,7 +51,7 @@ export default {
     width: 100%;
   }
   #loading {
-    top: 30px;
+    margin-top: 20px;
     text-align: center;
   }
   #loading #loading_pic{
@@ -68,6 +59,7 @@ export default {
     transform: translateX(-40%);
   }
   #loading #loading_text{
+    margin-top: 10px;
     margin-left: 50%;
     transform: translateX(-50%);
   }

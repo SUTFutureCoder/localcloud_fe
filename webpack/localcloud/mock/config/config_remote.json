@@ -1,0 +1,37 @@
+{
+  "_comment": ["配置相关"],
+  "_comment": ["配置连接"],
+  "config_connection": {
+    "error_no": 0,
+    "error_msg": "",
+    "data": {
+      "token": "abc123",
+      "sign": "wertyuiop[!@#$%^&*()_"
+    }
+  },
+
+  "_comment": ["文件相关"],
+  "file_list": {
+    "error_no": 0,
+    "error_msg": "",
+    "data": {
+      "path": "/home/lin/",
+      "file_list": [
+        {
+          "name": "极品~纯白女子高生 ロリコレ【特别推荐】",
+          "type": "dir"
+        },
+        {
+          "name": "#_mxgs657",
+          "type": "dir"
+        },
+        {
+          "name": "DVD1KG-58.jpg",
+          "type": "file",
+          "ext": "jpg",
+          "size": "159516"
+        }
+      ]
+    }
+  }
+}

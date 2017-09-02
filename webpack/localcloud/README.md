@@ -1,6 +1,6 @@
 # xy-travelnotes
 
-> 星柚游记
+> 本地云
 
 ## Build Setup
 
@@ -19,3 +19,10 @@ npm run build --report
 ```
 
 For detailed explanation on how things work, checkout the [guide](http://vuejs-templates.github.io/webpack/) and [docs for vue-loader](http://vuejs.github.io/vue-loader).
+
+# start mock
+```
+json-server --watch mock/* --port 9090 --routes mock/router.json 
+```
+
+

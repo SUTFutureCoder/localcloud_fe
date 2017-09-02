@@ -4,3 +4,5 @@
  * 接口字典
  *
  */
+//配置系列
+export const CONFIG_REMOTE_CONNECTION = "/config/connection";
