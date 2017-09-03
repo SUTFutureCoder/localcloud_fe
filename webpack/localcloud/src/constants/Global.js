@@ -4,6 +4,7 @@
  * Created by lin on 17-8-4.
  */
 export default {
-    remoteHost: '',
-    remotePort: '',
+    remote_proto: 'http',
+    remote_host: '',
+    remote_port: '',
 }
