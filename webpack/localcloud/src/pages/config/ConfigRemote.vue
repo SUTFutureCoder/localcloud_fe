@@ -18,8 +18,10 @@
 </template>
 
 <script>
+    import Bus from './../../assets/EventBus'
     import * as API from './../../constants/API'
     import * as Global from './../../constants/Global'
+    import * as RouterPath from './../../constants/RouterPaths'
     export default {
         data () {
             return {
@@ -65,7 +67,8 @@
                         //记录该连接方式下配置
 
                         //完成设置
-
+                        Bus.$emit("showbottom", true)
+                        vue.$router.push({path: RouterPath.PAGES_MAIN})
                     })
                     .catch(function (response) {
                         alert('连接失败，请确认ip和端口是否正确')

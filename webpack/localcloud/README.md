@@ -22,7 +22,7 @@ For detailed explanation on how things work, checkout the [guide](http://vuejs-t
 
 # start mock
 ```
-json-server --watch mock/config/* --port 9090 --routes mock/router.json 
+json-server --watch mock/* --port 9090 --routes mock/router.json 
 ```
 
-
+    

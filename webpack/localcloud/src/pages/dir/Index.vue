@@ -6,7 +6,7 @@
 <script>
     import Bus from '../../assets/EventBus'
     import * as Const from '../../constants/Const'
-    import TransformUi from '../common/transform_action/Transform_ui.vue'
+    import TransformUi from '../common/transform_action/TransformUI.vue'
     export default {
         data () {
             return {
