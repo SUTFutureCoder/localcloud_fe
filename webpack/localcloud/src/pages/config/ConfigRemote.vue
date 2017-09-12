@@ -36,15 +36,13 @@
             linkstart: function () {
                 let vue = this
                 //开始连接
-                if (this.remote_ip == '' || this.remote_port == ''){
+                if (this.remote_host == '' || this.remote_port == ''){
                     alert('请输入正确IP和端口')
                     return;
                 }
 
                 //临时设置全局变量
-                Global.remote_proto = this.remote_proto
-                Global.remote_host  = this.remote_host
-                Global.remote_port  = this.remote_port
+                Global.set(this.remote_proto, this.remote_host, this.remote_port)
 
                 let conn_url = API.C(API.CONFIG_REMOTE_CONNECTION)
                 if (conn_url == false){
@@ -58,8 +56,7 @@
                         let ret = response.body
                         if (ret['error_no'] != 0) {
                             alert(ret['error_msg'])
-                            Global.remote_host  = ""
-                            Global.remote_port  = ""
+                            Global.set("", "", "")
                             vue.remote_host = ""
                             vue.remote_port = ""
                             return;
@@ -72,8 +69,7 @@
                     })
                     .catch(function (response) {
                         alert('连接失败，请确认ip和端口是否正确')
-                        Global.remote_host  = ""
-                        Global.remote_port  = ""
+                        Global.set("", "", "")
                         vue.remote_host = ""
                         vue.remote_port = ""
                         return;

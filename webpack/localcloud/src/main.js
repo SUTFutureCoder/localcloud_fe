@@ -12,8 +12,8 @@ import * as Global from '../src/constants/Global'
 /**
  * 调试工具
  */
-import eruda from 'eruda'
-eruda.init()
+// import eruda from 'eruda'
+// eruda.init()
 
 Vue.config.productionTip = false
 Vue.prototype.GLOBAL = Global

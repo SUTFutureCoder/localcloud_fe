@@ -6,10 +6,11 @@
  */
 import * as Global from './Global'
 export function C(url) {
-    if (Global.remote_proto == "" || Global.remote_host == "" || Global.remote_port == "" || url == ""){
+    let global_config = Global.get()
+    if (global_config.remote_proto == "" || global_config.remote_host == "" || global_config.remote_port == "" || url == ""){
         return false
     }
-    return Global.remote_proto + '://' + Global.remote_host + ':' + Global.remote_port + url
+    return global_config.remote_proto + '://' + global_config.remote_host + ':' + global_config.remote_port + url
 }
 
 //配置系列
