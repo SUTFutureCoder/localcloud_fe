@@ -42,7 +42,7 @@
                 }
 
                 //临时设置全局变量
-                Global.set(this.remote_proto, this.remote_host, this.remote_port)
+                Global.set('remote_proto', this.remote_proto, 'remote_host', this.remote_host, 'remote_port', this.remote_port)
 
                 let conn_url = API.C(API.CONFIG_REMOTE_CONNECTION)
                 if (conn_url == false){

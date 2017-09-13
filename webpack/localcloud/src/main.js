@@ -35,4 +35,8 @@ Vue.http.interceptors.push((request, next) => {
 })
 
 document.addEventListener('touchstart', function (event) {
-}, true);
+}, true)
+
+document.addEventListener('deviceready', function () {
+    console.log(device.cordova)
+}, false)

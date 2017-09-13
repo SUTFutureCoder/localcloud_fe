@@ -12,6 +12,8 @@ let storage = window.localStorage
 export default {
     main: function (vue) {
         //主函数 推荐使用异步promise
+        //获取机型和token
+        // if (device.platform)
         //STEP1 从localstorage中获取该wifi下已远程IP和端口 暂略
 
         //STEP2 测试连接 暂略
