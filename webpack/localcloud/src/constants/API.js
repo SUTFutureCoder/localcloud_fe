@@ -7,7 +7,6 @@
 import * as Global from './Global'
 export function C(url) {
     let global_config = Global.get()
-    console.log(global_config)
     if (global_config.remote_proto == "" || global_config.remote_host == "" || global_config.remote_port == "" || url == ""){
         return false
     }
