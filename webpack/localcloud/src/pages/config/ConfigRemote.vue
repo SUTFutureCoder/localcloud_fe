@@ -18,9 +18,9 @@
 </template>
 
 <script>
+    import axios from 'axios'
     import Bus from './../../assets/EventBus'
     import * as API from './../../constants/API'
-    import * as Global from './../../constants/Global'
     import * as RouterPath from './../../constants/RouterPaths'
     export default {
         data () {
@@ -41,27 +41,24 @@
                     return;
                 }
 
-                //临时设置全局变量
-                Global.set('remote_proto', this.remote_proto, 'remote_host', this.remote_host, 'remote_port', this.remote_port)
-
-                let conn_url = API.C(API.CONFIG_REMOTE_CONNECTION)
-                if (conn_url == false){
-                    alert("请输入正确配置")
-                    return
-                }
-                this.$http.get(conn_url, {}, {
-                    emulateJSON: true
-                })
+                this.$http.get(this.remote_proto + '://' + this.remote_host + ':' + this.remote_port + API.CONFIG_REMOTE_CONNECTION)
                     .then((response) => {
-                        let ret = response.body
+                        let ret = response.data
                         if (ret['error_no'] != 0) {
-                            alert(ret['error_msg'])
-                            Global.set("", "", "")
-                            vue.remote_host = ""
-                            vue.remote_port = ""
+                            if (ret['error_msg'] != ""){
+                                alert(ret['error_msg'])
+                            } else {
+                                alert('连接失败，请确认ip和端口是否正确')
+                            }
+                            vue.remote_host = vue.remote_port = ""
                             return;
                         }
                         //记录该连接方式下配置
+                        vue.$http = axios.create({
+                            baseURL: vue.remote_proto + '://' + vue.remote_host + ':' + vue.remote_port + '/',
+                            timeout: 5000,
+                        })
+                        //以后不用拼接即可
 
                         //完成设置
                         Bus.$emit("showbottom", true)
@@ -69,9 +66,7 @@
                     })
                     .catch(function (response) {
                         alert('连接失败，请确认ip和端口是否正确')
-                        Global.set("", "", "")
-                        vue.remote_host = ""
-                        vue.remote_port = ""
+                        vue.remote_host = vue.remote_port = ""
                         return;
                     })
             }

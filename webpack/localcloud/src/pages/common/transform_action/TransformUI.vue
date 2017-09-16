@@ -3,7 +3,7 @@
         <mu-float-button icon="swap_vertical_circle" mini id="trans-float-button" @click="openTransformPopup()"/>
         <!--<form method="post" id="myForm" action="/fileTest.php" enctype="multipart/form-data">-->
             <mu-float-button icon="cloud_upload" mini id="upload-float-button" @click="uploadFile()"/>
-            <input type="file" id="transform_file_select" multiple style="display: none;" ref="transform_file_select" @change="uploadFileSelect()">
+            <input type="file" id="transform_file_select" multiple style="display: none;" ref="transform_file_select" @change="uploadFileSelect($event)">
         <!--</form>-->
 
         <mu-popup position="bottom" popupClass="popup-transform" :open="transform_popup" @close="closeTransformPopup()">
@@ -45,11 +45,17 @@
                 let elem = this.$refs.transform_file_select
                 elem.click()
             },
-            uploadFileSelect: function () {
-                let files = document.getElementById('transform_file_select').files
-                if (files && files.length) {
-                    let fd = new FormData()
+            uploadFileSelect: function (e) {
+                let files = e.target.files
+//                files = document.getElementById('transform_file_select').files
+                if (!files && 0 == files.length) {
+                    return
                 }
+                let fd = new FormData()
+
+
+                //http://www.cnblogs.com/imwtr/p/5957391.html
+
             }
         },
     }

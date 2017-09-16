@@ -10,6 +10,7 @@
     "build": "node build/build.js"
   },
   "dependencies": {
+    "axios": "^0.16.2",
     "eruda": "^1.2.4",
     "modernize": "^0.1.0",
     "modernizr": "^3.5.0",

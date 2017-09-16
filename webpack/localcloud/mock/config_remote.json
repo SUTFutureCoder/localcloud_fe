@@ -3,11 +3,7 @@
   "_comment": ["配置连接"],
   "config_connection": {
     "error_no": 0,
-    "error_msg": "",
-    "data": {
-      "token": "abc123",
-      "sign": "wertyuiop[!@#$%^&*()_"
-    }
+    "error_msg": ""
   },
 
   "_comment": ["文件相关"],
