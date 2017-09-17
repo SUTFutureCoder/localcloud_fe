@@ -50,12 +50,16 @@
                             } else {
                                 alert('连接失败，请确认ip和端口是否正确')
                             }
-                            vue.remote_host = vue.remote_port = ""
+                            vue.GLOBAL.remote_host = vue.GLOBAL.remote_port = ""
                             return;
                         }
                         //记录该连接方式下配置
+                        vue.GLOBAL.remote_proto = this.remote_proto
+                        vue.GLOBAL.remote_host  = this.remote_host
+                        vue.GLOBAL.remote_port  = this.remote_port
+
                         vue.$http = axios.create({
-                            baseURL: vue.remote_proto + '://' + vue.remote_host + ':' + vue.remote_port + '/',
+                            baseURL: vue.GLOBAL.remote_proto + '://' + vue.GLOBAL.remote_host + ':' + vue.GLOBAL.remote_port + '/',
                             timeout: 5000,
                         })
                         //以后不用拼接即可
@@ -66,7 +70,7 @@
                     })
                     .catch(function (response) {
                         alert('连接失败，请确认ip和端口是否正确')
-                        vue.remote_host = vue.remote_port = ""
+                        vue.GLOBAL.remote_host = vue.GLOBAL.remote_port = ""
                         return;
                     })
             }

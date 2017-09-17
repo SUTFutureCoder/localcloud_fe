@@ -12,7 +12,7 @@
             </mu-appbar>
             <mu-content-block>
                 <mu-list>
-                    <mu-list-item title="Photos" describeText="Jan 9, 2014" v-for="(key, file) in upload_files" :key="key">
+                    <mu-list-item title="Photos" describeText="Jan 9, 2014" v-for="(file, key) in upload_list" :key="key">
                         <mu-avatar icon="folder" slot="leftAvatar"/>
                         <mu-icon value="info" slot="right"/>
                     </mu-list-item>
@@ -23,14 +23,20 @@
 </template>
 <script>
     import Bus from '../../../assets/EventBus'
+    import MD5 from 'crypto-js/md5'
+
+
     export default {
         data () {
             return {
                 transform_popup: false,
-                upload_files: [],
+                upload_list: [],
+                upload_list_unique_check: {},   //用于检查是否重复上传，hash
             }
         },
         mounted() {
+            //导入全局上传列表 （包括了上次没传完的列表）
+            this.upload_list = this.GLOBAL.transform_upload
         },
         methods: {
             openTransformPopup: function () {
@@ -46,16 +52,28 @@
                 elem.click()
             },
             uploadFileSelect: function (e) {
+                e.preventDefault();
                 let files = e.target.files
 //                files = document.getElementById('transform_file_select').files
                 if (!files && 0 == files.length) {
                     return
                 }
-                let fd = new FormData()
 
+                //准备
+                for (let i = 0; i < files.length; ++i){
+                    //遍历检查
+                    let md5 = MD5(files[i].name + files[i].lastModified + files[i].size).toString()
+                    if (undefined != this.upload_list_unique_check[md5]){
+                        continue
+                    }
+                    this.upload_list[this.upload_list.length] = files[i]
+                    this.upload_list_unique_check[md5] = 1
+                }
+                this.GLOBAL.transform_upload = this.upload_list
 
+                //发送通知进行自动上传操作 符合函数单一职责SRP原则
+                Bus.$emit("upload_trigger", 1)
                 //http://www.cnblogs.com/imwtr/p/5957391.html
-
             }
         },
     }
