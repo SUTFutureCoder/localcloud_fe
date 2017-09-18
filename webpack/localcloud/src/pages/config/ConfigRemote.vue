@@ -22,6 +22,7 @@
     import Bus from './../../assets/EventBus'
     import * as API from './../../constants/API'
     import * as RouterPath from './../../constants/RouterPaths'
+    import StorageService from './../../service/Storage'
     export default {
         data () {
             return {
@@ -31,6 +32,9 @@
             }
         },
         mounted() {
+            if (StorageService.getRemoteConnConfig()){
+
+            }
         },
         methods: {
             linkstart: function () {
@@ -71,7 +75,7 @@
                     .catch(function (response) {
                         alert('连接失败，请确认ip和端口是否正确')
                         vue.GLOBAL.remote_host = vue.GLOBAL.remote_port = ""
-                        return;
+                        return
                     })
             }
         },

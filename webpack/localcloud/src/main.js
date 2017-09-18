@@ -12,20 +12,12 @@ import Global from '../src/constants/Global'
 /**
  * 调试工具
  */
-import eruda from 'eruda'
-eruda.init()
-
-/**
- * 服务初始化
- */
-import TransformService from './service/Transform'
-import StorageService from './service/Storage'
-TransformService.init()
-StorageService.init()
+// import eruda from 'eruda'
+// eruda.init()
 
 Vue.config.productionTip = false
 Vue.prototype.GLOBAL = Global
-Vue.prototype.$http  = axios
+Vue.prototype.$http  = axios //todo超时设定
 
 Vue.use(MuseUI)
 

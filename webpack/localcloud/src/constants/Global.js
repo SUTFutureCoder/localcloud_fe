@@ -5,6 +5,14 @@
  */
 
 export default {
+    //本机设置
+    is_mobile    : 1,           //是否为浏览器或是移动端
+    device_info  : {
+        wifi    : "",
+        ssid    : "",
+        token   : "",
+    },                          //设备信息
+
     //远程配置
     remote_proto : '',
     remote_host  : '',
