@@ -12,6 +12,9 @@ export default {
         ssid    : "",
         token   : "",
     },                          //设备信息
+    device       : {            //原始设备信息
+
+    },
 
     //远程配置
     remote_proto : '',

@@ -16,9 +16,11 @@ export default {
         let that = this
         //主函数 推荐使用异步promise
         //获取机型和token
+        // console.log(window.device)
         try {
             if (device.platform){
                 //添加到is_mobile中
+                console.log(device)
                 console.log(device)
             }
         } catch (e){

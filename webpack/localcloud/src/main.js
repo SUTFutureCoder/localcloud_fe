@@ -12,8 +12,8 @@ import Global from '../src/constants/Global'
 /**
  * 调试工具
  */
-// import eruda from 'eruda'
-// eruda.init()
+import eruda from 'eruda'
+eruda.init()
 
 Vue.config.productionTip = false
 Vue.prototype.GLOBAL = Global
@@ -32,6 +32,8 @@ new Vue({
 document.addEventListener('touchstart', function (event) {
 }, true)
 
-document.addEventListener('deviceready', function () {
-    console.log(device.cordova)
-}, false)
+document.addEventListener('deviceready', onDeviceReady, false)
+function onDeviceReady() {
+    console.log(device)
+    window.device = device
+}
