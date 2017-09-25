@@ -17,23 +17,25 @@ eruda.init()
 
 Vue.config.productionTip = false
 Vue.prototype.GLOBAL = Global
-Vue.prototype.$http  = axios //todo超时设定
+Vue.prototype.$http  = axios.create({
+    timeout: 1000,
+})
 
 Vue.use(MuseUI)
 
 /* eslint-disable no-new */
-new Vue({
-  el: '#app',
-  router,
-  template: '<App/>',
-  components: { App }
+let vue_instance = new Vue({
+    el: '#app',
+    router,
+    template: '<App/>',
+    components: { App },
 })
 
 document.addEventListener('touchstart', function (event) {
 }, true)
 
-document.addEventListener('deviceready', onDeviceReady, false)
-function onDeviceReady() {
-    console.log(device)
-    window.device = device
-}
+document.addEventListener('deviceready', () => {
+    //注意device操作前要判断是否存在这个参数
+    vue_instance.GLOBAL.device = device
+    console.log(vue_instance.GLOBAL)
+}, false)

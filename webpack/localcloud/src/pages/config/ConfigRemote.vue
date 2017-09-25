@@ -32,9 +32,6 @@
             }
         },
         mounted() {
-            if (StorageService.getRemoteConnConfig()){
-
-            }
         },
         methods: {
             linkstart: function () {
@@ -67,6 +64,15 @@
                             timeout: 5000,
                         })
                         //以后不用拼接即可
+
+                         StorageService.storageRemoteConnConfig({
+                             wifi    :   vue.GLOBAL.device_info.wifi,
+                             ssid    :   vue.GLOBAL.device_info.ssid,
+                             token   :   vue.GLOBAL.device_info.token,
+                             proto   :   vue.GLOBAL.remote_proto,
+                             host    :   vue.GLOBAL.remote_host,
+                             port    :   vue.GLOBAL.remote_port,
+                         })
 
                         //完成设置
                         Bus.$emit("showbottom", true)

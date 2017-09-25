@@ -36,22 +36,23 @@ export default {
     },
 
     storageRemoteConnConfig: function (data) {
-        let tmp_storage = []
-        let ssid_check  = []
-        for (let d in data){
-            for (let i in storage_config_remote_conn){
-                if (undefined == data[d][i]){
-                    return false
-                }
-            }
-            if (ssid_check[data[d]['ssid']] == data[d]['wifi']){
-                continue
-            }
-            ssid_check[data[d]['ssid']] = data[d]['wifi']
-            tmp_storage.push(data[d])
+        let current_remote_conn_storage = this.getRemoteConnConfig()
+        if (current_remote_conn_storage == false){
+            current_remote_conn_storage = []
         }
 
-        storage.setItem(storage_config_remote_conn_key, JSON.stringify(tmp_storage))
+        for (let i in current_remote_conn_storage){
+            if (current_remote_conn_storage[i].ssid == data.ssid){
+                //覆盖
+                current_remote_conn_storage[i] = data
+                storage.setItem(storage_config_remote_conn_key, JSON.stringify(current_remote_conn_storage))
+                return true
+            }
+        }
+
+        current_remote_conn_storage.push(data)
+        storage.setItem(storage_config_remote_conn_key, JSON.stringify(current_remote_conn_storage))
+        return true
     },
 
     getUploadList: function () {

@@ -50,7 +50,7 @@ export default {
             return
         }
 
-        //STEP2 测试连接 暂略
+        //STEP2 测试连接
         vue.$http.get(tmp_conn_config.proto + '://' + tmp_conn_config.host + ':' + tmp_conn_config.port + API.CONFIG_REMOTE_CONNECTION)
             .then((response) => {
                 let ret = response.data
