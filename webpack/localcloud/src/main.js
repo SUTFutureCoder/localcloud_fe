@@ -35,7 +35,7 @@ document.addEventListener('touchstart', function (event) {
 }, true)
 
 document.addEventListener('deviceready', () => {
-    //注意device操作前要判断是否存在这个参数
+    //注意device操作前要判断是否存在这个参数，并且确定设备已经就绪
     vue_instance.GLOBAL.device = device
-    console.log(vue_instance.GLOBAL)
+    vue_instance.GLOBAL.device_ready = true
 }, false)

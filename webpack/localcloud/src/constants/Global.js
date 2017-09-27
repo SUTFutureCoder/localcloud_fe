@@ -15,6 +15,7 @@ export default {
     device       : {            //原始设备信息
 
     },
+    device_ready : false,       //设备是否准备就绪
 
     //远程配置
     remote_proto : '',

@@ -24,7 +24,7 @@
 <script>
     import Bus from '../../../assets/EventBus'
     import MD5 from 'crypto-js/md5'
-
+    import TransformService from './../../../service/Transform'
 
     export default {
         data () {
@@ -37,6 +37,8 @@
         mounted() {
             //导入全局上传列表 （包括了上次没传完的列表）
             this.upload_list = this.GLOBAL.transform_upload
+            //初始化传输服务
+            TransformService.init()
         },
         methods: {
             openTransformPopup: function () {
@@ -72,8 +74,8 @@
                 this.GLOBAL.transform_upload = this.upload_list
 
                 //发送通知进行自动上传操作 符合函数单一职责SRP原则
+                //更新状态统一由GLOBAL控制
                 Bus.$emit("upload_trigger", 1)
-                //http://www.cnblogs.com/imwtr/p/5957391.html
             }
         },
     }
