@@ -23,7 +23,6 @@
 </template>
 <script>
     import Bus from '../../../assets/EventBus'
-    import MD5 from 'crypto-js/md5'
     import TransformService from './../../../service/Transform'
 
     export default {
@@ -39,6 +38,8 @@
             this.upload_list = this.GLOBAL.transform_upload
             //初始化传输服务
             TransformService.init()
+            //监听同步上传列表事件
+            Bus.$on("upload_list_sync", this.syncUploadList)
         },
         methods: {
             openTransformPopup: function () {
@@ -64,18 +65,25 @@
                 //准备
                 for (let i = 0; i < files.length; ++i){
                     //遍历检查
-                    let md5 = MD5(files[i].name + files[i].lastModified + files[i].size).toString()
+                    let md5 = TransformService.fileHash(files[i])
                     if (undefined != this.upload_list_unique_check[md5]){
                         continue
                     }
                     this.upload_list[this.upload_list.length] = files[i]
                     this.upload_list_unique_check[md5] = 1
                 }
+
+                //附加文件签名
+                this.upload_list = TransformService.signFileHash(this.upload_list)
                 this.GLOBAL.transform_upload = this.upload_list
 
                 //发送通知进行自动上传操作 符合函数单一职责SRP原则
                 //更新状态统一由GLOBAL控制
                 Bus.$emit("upload_trigger", 1)
+            },
+            
+            syncUploadList: function () {
+                
             }
         },
     }
