@@ -59,6 +59,9 @@
                         vue.GLOBAL.remote_host  = this.remote_host
                         vue.GLOBAL.remote_port  = this.remote_port
 
+                        //记录用户token
+                        vue.GLOBAL.user_token   = ret['data']['token']
+
                         vue.$http = axios.create({
                             baseURL: vue.GLOBAL.remote_proto + '://' + vue.GLOBAL.remote_host + ':' + vue.GLOBAL.remote_port + '/',
                             timeout: 5000,

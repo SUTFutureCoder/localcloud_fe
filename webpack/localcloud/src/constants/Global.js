@@ -17,6 +17,9 @@ export default {
     },
     device_ready : false,       //设备是否准备就绪
 
+    //用户配置
+    user_token  : "",
+
     //远程配置
     remote_proto : '',
     remote_host  : '',

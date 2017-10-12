@@ -5,6 +5,7 @@
  */
 import Bus from './../assets/EventBus'
 import MD5 from 'crypto-js/md5'
+import SHA256 from 'crypto-js/sha256'
 
 let upload_trigger = false
 let upload_hash    = [] //防止重复上传，包括页面打开后已上传和上传中的hash
@@ -34,17 +35,41 @@ export default {
                 //找到并塞入第一个没处理的文件
                 let first_not_upload_pointer = 0
                 for (let f = 0; f < Bus.GLOBAL.transform_upload.length; f++) {
-                    if (upload_hash[Bus.GLOBAL.transform_upload.hash] == undefined) {
+                    if (upload_hash[Bus.GLOBAL.transform_upload[f].hash] == undefined) {
                         first_not_upload_pointer = f
-                        break;
+                        break
                     }
                 }
-                upload_queue[i] = Bus.GLOBAL.transform_upload[i]
-
-                if (tmpFileHash != false) {
-                    upload_hash[tmpFileHash] = 1
+                if (upload_hash[Bus.GLOBAL.transform_upload[first_not_upload_pointer].hash] != undefined) {
+                    continue
                 }
+                upload_queue[i] = Bus.GLOBAL.transform_upload[first_not_upload_pointer]
+                upload_hash[Bus.GLOBAL.transform_upload[first_not_upload_pointer].hash] = 1
             }
+        }
+
+        //STEP2 开始文件间的异步操作，注意函数化
+        for (let i = 0; i < upload_queue.length; i++) {
+            //STEP2.1 检查transform_upload传输列表中的原始数据状态，是否已经被准许上传
+
+
+
+            this.$http.post('/file/upload/requestion', {
+                token: this.GLOBAL.user_token,
+
+            })
+                .then(function (response) {
+                    console.log(response)
+                    //这里区别秒传和不允许传输的情况
+
+                    //从这里如果获得了上传用token则开始各个文件自己的上传操作
+
+                    //接力往队列中进行添加
+                    
+                })
+                .catch(function (response) {
+
+                })
         }
     },
 
@@ -63,9 +88,14 @@ export default {
         }
         return files
     },
-    
+
     dataHash: function () {
         
+    },
+
+    //检查系列
+    checkGlobalFileStatus: function () {
+
     }
 
 }
