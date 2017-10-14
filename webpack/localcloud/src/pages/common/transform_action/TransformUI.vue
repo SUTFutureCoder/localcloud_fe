@@ -55,6 +55,8 @@
                 elem.click()
             },
             uploadFileSelect: function (e) {
+                let tmp_upload_list = []
+
                 e.preventDefault();
                 let files = e.target.files
 //                files = document.getElementById('transform_file_select').files
@@ -69,21 +71,32 @@
                     if (undefined != this.upload_list_unique_check[md5]){
                         continue
                     }
-                    this.upload_list[this.upload_list.length] = files[i]
+                    tmp_upload_list.push(files[i])
                     this.upload_list_unique_check[md5] = 1
                 }
 
+                //排除没有上传文件的情况
+                if (!tmp_upload_list.length){
+                    return false
+                }
+
                 //附加文件签名
-                this.upload_list = TransformService.signFileHash(this.upload_list)
-                this.GLOBAL.transform_upload = this.upload_list
+                tmp_upload_list = TransformService.signFileHash(tmp_upload_list)
+                //初始化文件传输状态
+                tmp_upload_list = TransformService.initFileTransObject(tmp_upload_list)
+                //注意这里需要push进去
+                this.GLOBAL.transform_upload.push.apply(this.GLOBAL.transform_upload, tmp_upload_list)
 
                 //发送通知进行自动上传操作 符合函数单一职责SRP原则
                 //更新状态统一由GLOBAL控制
                 Bus.$emit("upload_trigger", 1)
+                //更新展示用列表
+                Bus.$emit("upload_list_sync", 1)
             },
-            
+
+            //同步展示用文件列表
             syncUploadList: function () {
-                
+                this.upload_list = this.GLOBAL.transform_upload
             }
         },
     }
