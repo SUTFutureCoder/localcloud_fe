@@ -19,6 +19,7 @@
 
 <script>
     import axios from 'axios'
+    import axiosRetry from 'axios-retry'
     import Bus from './../../assets/EventBus'
     import * as API from './../../constants/API'
     import * as RouterPath from './../../constants/RouterPaths'
@@ -66,6 +67,8 @@
                             baseURL: vue.GLOBAL.remote_proto + '://' + vue.GLOBAL.remote_host + ':' + vue.GLOBAL.remote_port + '/',
                             timeout: 5000,
                         })
+                        axiosRetry(vue.$http, { retries: 3 })
+
                         //以后不用拼接即可
 
                          StorageService.storageRemoteConnConfig({

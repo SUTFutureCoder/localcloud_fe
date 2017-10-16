@@ -2,6 +2,7 @@
 // (runtime-only or standalone) has been set in webpack.base.conf with an alias.
 import Vue from 'vue'
 import axios from 'axios'
+import axiosRetry from 'axios-retry'
 import MuseUI from 'muse-ui'
 import 'muse-ui/dist/muse-ui.css'
 import 'muse-ui/dist/theme-light.css'
@@ -17,9 +18,11 @@ eruda.init()
 
 Vue.config.productionTip = false
 Vue.prototype.GLOBAL = Global
+
 Vue.prototype.$http  = axios.create({
     timeout: 1000,
 })
+axiosRetry(Vue.prototype.$http, { retries: 3 })
 
 Vue.use(MuseUI)
 

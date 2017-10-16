@@ -6,6 +6,7 @@
  */
 import Vue from './EventBus'
 import axios from 'axios'
+import axiosRetry from 'axios-retry'
 import * as RouterPath from './../constants/RouterPaths'
 import * as API from './../constants/API'
 import StorageService from './../service/Storage'
@@ -51,7 +52,7 @@ export default {
         }
 
         //STEP2 测试连接
-        vue.$http.get(tmp_conn_config.proto + '://' + tmp_conn_config.host + ':' + tmp_conn_config.port + API.CONFIG_REMOTE_CONNECTION)
+        Vue.$http.get(tmp_conn_config.proto + '://' + tmp_conn_config.host + ':' + tmp_conn_config.port + API.CONFIG_REMOTE_CONNECTION)
             .then((response) => {
                 let ret = response.data
                 if (ret['error_no'] != 0) {
@@ -64,14 +65,15 @@ export default {
                 }
 
                 //记录该连接方式下配置
-                vue.GLOBAL.remote_proto = tmp_conn_config.proto
-                vue.GLOBAL.remote_host  = tmp_conn_config.host
-                vue.GLOBAL.remote_port  = tmp_conn_config.port
+                Vue.GLOBAL.remote_proto = tmp_conn_config.proto
+                Vue.GLOBAL.remote_host  = tmp_conn_config.host
+                Vue.GLOBAL.remote_port  = tmp_conn_config.port
 
-                vue.$http = axios.create({
-                    baseURL: vue.GLOBAL.remote_proto + '://' + vue.GLOBAL.remote_host + ':' + vue.GLOBAL.remote_port + '/',
+                Vue.$http = axios.create({
+                    baseURL: Vue.GLOBAL.remote_proto + '://' + Vue.GLOBAL.remote_host + ':' + Vue.GLOBAL.remote_port + '/',
                     timeout: 5000,
                 })
+                axiosRetry(Vue.$http, { retries: 3 })
             })
             .catch(function (response) {
                 console.log(response)
