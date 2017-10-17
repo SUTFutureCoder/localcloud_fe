@@ -3,7 +3,7 @@
  *
  * Created by lin on 17-9-17.
  */
-import Bus from './../assets/EventBus'
+import Vue from './../assets/EventBus'
 import MD5 from 'crypto-js/md5'
 import SHA256 from 'crypto-js/sha256'
 
@@ -27,7 +27,7 @@ let upload_trans_cron_id = 0
 export default {
     init: function () {
         //用于初始化
-        Bus.$on('upload_trigger', ((bool) => {
+        Vue.$on('upload_trigger', ((bool) => {
             if (bool) {
                 upload_trigger = true
                 //开始上传任务
@@ -67,7 +67,7 @@ export default {
 
         //到这里才进行遍历可进行的上传列表
         this.startTransUploadTask(new_upload_task)
-        console.log('end')
+
         //往上次处理的列表添加hash
         this.setLastUploadListHash(tmp_upload_list)
     },
@@ -92,11 +92,6 @@ export default {
         
     },
 
-    //检查系列
-    checkGlobalFileStatus: function () {
-
-    },
-
     //文件队列标记
     //批量初始化文件传输object
     initFileTransObject: function (files) {
@@ -107,20 +102,31 @@ export default {
     },
     //修改文件传输object
     updateFileTransObject: function (file, object) {
-        file.upload_task = object
-        return file
+        //到列表中进行寻找
+        for (let i in Vue.GLOBAL.transform_upload) {
+            if (Vue.GLOBAL.transform_upload[i].hash == file.hash) {
+                //进行增量定点修改，相信结构一致
+                for (let j in object) {
+                    Vue.GLOBAL.transform_upload[i].upload_task[j] = object[j]
+                }
+                console.log(Vue.GLOBAL.transform_upload[i])
+                return true
+            }
+        }
+
+        return false
     },
     //获取可上传的object
     getCanUploadFileObjectList: function () {
         let tmp_can_upload = []
 
-        for (let i in Bus.GLOBAL.transform_upload) {
+        for (let i in Vue.GLOBAL.transform_upload) {
             //STEP1 先检查传输对象中status = 1进行的有并发个
             //STEP2 填充等待上传部分
-            if (TRANS_STATUS_RUNNING == Bus.GLOBAL.transform_upload[i].upload_task.status
-                ||  TRANS_STATUS_PENDING == Bus.GLOBAL.transform_upload[i].upload_task.status) {
-                tmp_can_upload.push(Bus.GLOBAL.transform_upload[i])
-                if (tmp_can_upload.length == Bus.GLOBAL.transform_task) {
+            if (TRANS_STATUS_RUNNING == Vue.GLOBAL.transform_upload[i].upload_task.status
+                ||  TRANS_STATUS_PENDING == Vue.GLOBAL.transform_upload[i].upload_task.status) {
+                tmp_can_upload.push(Vue.GLOBAL.transform_upload[i])
+                if (tmp_can_upload.length == Vue.GLOBAL.transform_task) {
                     return tmp_can_upload
                 }
             }
@@ -151,28 +157,92 @@ export default {
             this.last_upload_list_hash[last_upload[i].hash] = 1
         }
     },
+    //将文件移除上传列表
+    removeFileFromUploadList: function (file) {
+        //到列表中进行寻找
+        for (let i in Vue.GLOBAL.transform_upload) {
+            if (Vue.GLOBAL.transform_upload[i].hash == file.hash) {
+                Vue.GLOBAL.transform_upload.splice(i, 1)
+                return true
+            }
+        }
+        return false
+    },
     //开始执行上传主任务
     startTransUploadTask: function (upload_file) {
-        // for (let i in upload_file) {
+        for (let i in upload_file) {
             //初始化任务
-            Bus.$http.post('/file/upload/requestion', {
-                    token: Bus.GLOBAL.user_token,
-                    status: 1,
-                    // hash:  upload_file[i].hash,
-                })
-                .then((response) => {
-                    //修改状态
+            Vue.$http.post('/file/upload/requestion', {
+                token: Vue.GLOBAL.user_token,
+                status: 1,
+                // hash:  upload_file[i].hash,
+            })
+            .then((ret) => {
+                try {
+                    //检查返回值
+                    if (ret['error_no'] != 0) {
+                        if (ret['error_msg'] != ""){
+                            alert(ret['error_msg'])
+                            throw ret['error_msg'];
+                        }
+                        return;
+                    }
 
                     //这里区别秒传和不允许传输的情况
+                    if (ret['data']['sec_trans'] == 1) {
+                        //秒传从队列中移除文件
+                        this.removeFileFromUploadList(upload_file[i])
+                        return true
+                    }
 
-                    //从这里如果获得了上传用token则开始各个文件自己的上传操作
+                    //修改状态
+                    if (false == this.updateFileTransObject(upload_file[i], {status: TRANS_STATUS_RUNNING})){
+                        console.log('文件在队列中不存在')
+                        return false
+                    }
 
-                })
-                .catch((error) => {
-                    console.log(error)
-                })
+                    //从这里如果获得了上传用token则开始各个文件自己的上传操作 第一版先不管token
+                    //进行分片处理
+                    let slice_sum = Math.ceil(upload_file[i].size / Vue.GLOBAL.transform_chunk)
 
-        // }
+                    //开始上传
+                    Vue.$http.post('/file/upload/requestion', {
+                        token: Vue.GLOBAL.user_token,
+                        status: 1,
+                        // hash:  upload_file[i].hash,
+                    })
+                    .then((ret) => {
+
+                    })
+                    .catch((error) => {
+                        console.log(error)
+                        if (false == this.updateFileTransObject(upload_file[i], {status: TRANS_STATUS_EXCEPTION})){
+                            console.log('文件在队列中不存在')
+                            return false
+                        }
+                    })
+
+                } catch (err) {
+                    console.log(err)
+                    if (false == this.updateFileTransObject(upload_file[i], {status: TRANS_STATUS_EXCEPTION})){
+                        console.log('文件在队列中不存在')
+                        return false
+                    }
+                }
+            })
+            .catch((error) => {
+                let slice_sum = Math.ceil(upload_file[i].size / Vue.GLOBAL.transform_chunk)
+                console.log()
+
+
+                console.log(error)
+                if (false == this.updateFileTransObject(upload_file[i], {status: TRANS_STATUS_EXCEPTION})){
+                    console.log('文件在队列中不存在')
+                    return false
+                }
+            })
+
+        }
 
     }
 
