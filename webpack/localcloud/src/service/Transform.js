@@ -4,8 +4,10 @@
  * Created by lin on 17-9-17.
  */
 import Vue from './../assets/EventBus'
+import 'crypto-js/lib-typedarrays.js'
 import MD5 from 'crypto-js/md5'
 import SHA256 from 'crypto-js/sha256'
+
 
 //上传触发
 let upload_trigger = false
@@ -13,8 +15,9 @@ let upload_trigger = false
 const TRANS_TASK_OBJECT_TPL = {
     status:     0,
     progress:   0.0,
-    slice_current: 0,
-    slice_sum:  0,
+    slice_trunk:   0,   //分片大小
+    slice_current: 0,   //当前分片
+    slice_sum:  0,      //分片总数
 }
 //status常量
 const TRANS_STATUS_PENDING = 0      //等待
@@ -77,7 +80,7 @@ export default {
         if (undefined == file || undefined == file.name || undefined == file.lastModified || undefined == file.size){
             return false
         }
-        return MD5(file.name + file.lastModified + file.size).toString();
+        return MD5(file.name + file.lastModified + file.size).toString()
     },
 
     //用于标记文件HASH值
@@ -88,8 +91,9 @@ export default {
         return files
     },
 
-    dataHash: function () {
-        
+    dataHash: function (data) {
+        console.log(SHA256(data).toString())
+        return SHA256(data).toString()
     },
 
     //文件队列标记
@@ -109,7 +113,6 @@ export default {
                 for (let j in object) {
                     Vue.GLOBAL.transform_upload[i].upload_task[j] = object[j]
                 }
-                console.log(Vue.GLOBAL.transform_upload[i])
                 return true
             }
         }
@@ -196,14 +199,14 @@ export default {
                     }
 
                     //修改状态
-                    if (false == this.updateFileTransObject(upload_file[i], {status: TRANS_STATUS_RUNNING})){
+                    if (false == this.updateFileTransObject(upload_file[i], {status: TRANS_STATUS_RUNNING, slice_trunk: Vue.GLOBAL.transform_chunk})){
                         console.log('文件在队列中不存在')
                         return false
                     }
 
                     //从这里如果获得了上传用token则开始各个文件自己的上传操作 第一版先不管token
                     //进行分片处理
-                    let slice_sum = Math.ceil(upload_file[i].size / Vue.GLOBAL.transform_chunk)
+                    // let slice_sum = Math.ceil(upload_file[i].size / Vue.GLOBAL.transform_chunk)
 
                     //开始上传
                     Vue.$http.post('/file/upload/requestion', {
@@ -231,8 +234,18 @@ export default {
                 }
             })
             .catch((error) => {
-                let slice_sum = Math.ceil(upload_file[i].size / Vue.GLOBAL.transform_chunk)
-                console.log()
+                this.updateFileTransObject(upload_file[i], {status: TRANS_STATUS_RUNNING, slice_trunk: Vue.GLOBAL.transform_chunk})
+                let slice_sum = Math.ceil(upload_file[i].size / upload_file[i].upload_task.slice_trunk)
+                for (let slice = 1; slice <= slice_sum; slice++) {
+                    let start_byte = upload_file[i].upload_task.slice_trunk * (slice - 1)
+                    let end_byte   = upload_file[i].upload_task.slice_trunk * slice - 1
+                    let file_slice = upload_file[i].slice(start_byte, end_byte)
+                    console.log(file_slice)
+                    let slice_hash = this.dataHash(file_slice)
+                    let fd = new FormData()
+                    fd.append('file', upload_file[i].slice(start_byte, end_byte))
+
+                }
 
 
                 console.log(error)
