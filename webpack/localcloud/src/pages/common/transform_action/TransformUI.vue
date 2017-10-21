@@ -24,6 +24,7 @@
 <script>
     import Bus from '../../../assets/EventBus'
     import TransformService from './../../../service/Transform'
+    import FileCrypto from './../../../service/FileCrypto'
 
     export default {
         data () {
@@ -66,8 +67,8 @@
 
                 //准备
                 for (let i = 0; i < files.length; ++i){
-                    //遍历检查
-                    let md5 = TransformService.fileHash(files[i])
+                    //遍历检查上传列表是否已经存在
+                    let md5 = TransformService.fileNameHash(files[i])
                     if (undefined != this.upload_list_unique_check[md5]){
                         continue
                     }
@@ -80,15 +81,18 @@
                     return false
                 }
 
-                //附加文件签名
-                tmp_upload_list = TransformService.signFileHash(tmp_upload_list)
                 //初始化文件传输状态
                 tmp_upload_list = TransformService.initFileTransObject(tmp_upload_list)
+                //附加文件名签名，标记上传唯一性
+                tmp_upload_list = TransformService.signFileNameHash(tmp_upload_list)
+                //附加文件和文件分片签名，标记完整性
+                TransformService.signFileHash(tmp_upload_list)
                 //注意这里需要push进去
                 this.GLOBAL.transform_upload.push.apply(this.GLOBAL.transform_upload, tmp_upload_list)
 
                 //发送通知进行自动上传操作 符合函数单一职责SRP原则
                 //更新状态统一由GLOBAL控制
+                //更新：这里原来直接开始上传通知，但因为计算hash是异步，所以将开始上传通知单独独立成成一个方法。该方法会在接受hash之后开始
                 Bus.$emit("upload_trigger", 1)
                 //更新展示用列表
                 Bus.$emit("upload_list_sync", 1)

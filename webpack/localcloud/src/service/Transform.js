@@ -4,22 +4,22 @@
  * Created by lin on 17-9-17.
  */
 import Vue from './../assets/EventBus'
-import 'crypto-js/lib-typedarrays.js'
-import MD5 from 'crypto-js/md5'
-import SHA256 from 'crypto-js/sha256'
+import SJCL from 'sjcl'
+import FileCrypto from './FileCrypto'
 
 
 //上传触发
 let upload_trigger = false
 //文件传输对象模板
 const TRANS_TASK_OBJECT_TPL = {
-    status:     0,
+    status:     -1,
     progress:   0.0,
     slice_trunk:   0,   //分片大小
     slice_current: 0,   //当前分片
     slice_sum:  0,      //分片总数
 }
 //status常量
+const TRANS_STATUS_PREPARE = -1     //准备中 通常计算hash中
 const TRANS_STATUS_PENDING = 0      //等待
 const TRANS_STATUS_RUNNING = 1      //进行
 const TRANS_STATUS_PAUSE   = 2      //暂停
@@ -49,6 +49,8 @@ export default {
                 upload_trans_cron_id = 0
             }
         }))
+        //用于接受hash
+        // Vue.$on('file_hash')
     },
 
     //上传主流程，因为不依赖其他的数据源，所以注意判断 直接传就可以
@@ -58,9 +60,10 @@ export default {
             return false
         }
 
+        //任务如果就绪则置为pending
+        this.checkFileIsReady()
         //找目前可以进行的
         let tmp_upload_list = this.getCanUploadFileObjectList()
-
         //检查是否需要启动新的上传任务
         let new_upload_task = this.getNewUploadTask(tmp_upload_list)
         if (!new_upload_task.length) {
@@ -74,33 +77,54 @@ export default {
         //往上次处理的列表添加hash
         this.setLastUploadListHash(tmp_upload_list)
     },
+    //分割文件至上传分块
+    sliceFileToTruck: function () {
+        let slice_sum = Math.ceil(upload_file[i].size / upload_file[i].upload_task.slice_trunk)
+        for (let slice = 1; slice <= slice_sum; slice++) {
+            let start_byte = upload_file[i].upload_task.slice_trunk * (slice - 1)
+            let end_byte   = upload_file[i].upload_task.slice_trunk * slice
+            let file_slice = upload_file[i].slice(start_byte, end_byte)
+            console.log(file_slice)
+            // let slice_hash = this.dataHash(file_slice)
+            let fd = new FormData()
+            fd.append('file', upload_file[i].slice(start_byte, end_byte))
 
-    //用于计算文件HASH值，保证文件粒度唯一性
-    fileHash: function (file) {
+        }
+    },
+
+    //用于计算文件名称HASH值，保证文件大概率上传列表唯一性。注意不要使用此方法进行Hash计算
+    fileNameHash: function (file) {
         if (undefined == file || undefined == file.name || undefined == file.lastModified || undefined == file.size){
             return false
         }
-        return MD5(file.name + file.lastModified + file.size).toString()
+
+        return SJCL.codec.hex.fromBits(SJCL.hash.sha256.hash(file.name + file.lastModified + file.size))
     },
 
-    //用于标记文件HASH值
-    signFileHash: function (files) {
+    //用于标记文件名称HASH值，针对上传列表
+    signFileNameHash: function (files) {
         for (let i = 0; i < files.length; i++) {
-            files[i].hash = this.fileHash(files[i])
+            files[i].name_hash = this.fileNameHash(files[i])
         }
         return files
     },
-
-    dataHash: function (data) {
-        console.log(SHA256(data).toString())
-        return SHA256(data).toString()
+    //用于标记文件hash，针对数据完整性
+    signFileHash: function (files) {
+        for (let i = 0; i < files.length; i++) {
+            FileCrypto.sha512File(files[i])
+            FileCrypto.sha512Slice(files[i])
+        }
+        //因为是异步模型，所以没有返回值
     },
-
     //文件队列标记
-    //批量初始化文件传输object
+    //批量初始化文件传输object,同时预分片
     initFileTransObject: function (files) {
         for (let i in files){
-            files[i].upload_task = TRANS_TASK_OBJECT_TPL
+            let tmp_task_obj = TRANS_TASK_OBJECT_TPL
+            //对文件进行预分片
+            tmp_task_obj.slice_trunk = Vue.GLOBAL.transform_chunk
+            tmp_task_obj.slice_sum = Math.ceil(files[i].size / Vue.GLOBAL.transform_chunk)
+            files[i].upload_task = tmp_task_obj
         }
         return files
     },
@@ -108,7 +132,7 @@ export default {
     updateFileTransObject: function (file, object) {
         //到列表中进行寻找
         for (let i in Vue.GLOBAL.transform_upload) {
-            if (Vue.GLOBAL.transform_upload[i].hash == file.hash) {
+            if (Vue.GLOBAL.transform_upload[i].name_hash == file.name_hash) {
                 //进行增量定点修改，相信结构一致
                 for (let j in object) {
                     Vue.GLOBAL.transform_upload[i].upload_task[j] = object[j]
@@ -119,11 +143,33 @@ export default {
 
         return false
     },
+    //检查是否已经完成hash等一系列文件准备工作，如完成则改变状态为pending
+    checkFileIsReady: function () {
+        for (let i in Vue.GLOBAL.transform_upload) {
+            if (Vue.GLOBAL.transform_upload[i].upload_task.status == TRANS_STATUS_PREPARE) {
+                console.log(Vue.GLOBAL.transform_upload[i].hash)
+                if (undefined != Vue.GLOBAL.transform_upload[i].hash
+                        && undefined != Vue.GLOBAL.transform_upload[i].slice_hash
+                        && Vue.GLOBAL.transform_upload[i].slice_hash.length == Vue.GLOBAL.transform_upload[i].upload_task.slice_sum) {
+                    console.log('asdfasdfasdf')
+                    //准备就绪
+                    //如果顺序错乱严重，则需要将这个元素放到任务队列末尾
+                    let tmp = Vue.GLOBAL.transform_upload[i]
+                    //避免出现竞争修改情况
+                    tmp.upload_task.status = TRANS_STATUS_PENDING
+                    Vue.GLOBAL.transform_upload.splice(i, 1)
+                    Vue.GLOBAL.transform_upload.push(tmp)
+                }
+
+            }
+        }
+    },
     //获取可上传的object
     getCanUploadFileObjectList: function () {
         let tmp_can_upload = []
 
         for (let i in Vue.GLOBAL.transform_upload) {
+            //STEP0 检查传输对象里文件和文件分片是否已经签名完毕
             //STEP1 先检查传输对象中status = 1进行的有并发个
             //STEP2 填充等待上传部分
             if (TRANS_STATUS_RUNNING == Vue.GLOBAL.transform_upload[i].upload_task.status
@@ -145,7 +191,7 @@ export default {
 
         let new_upload_task = []
         for (let i in upload_list) {
-            if (undefined != this.last_upload_list_hash[upload_list[i].hash]) {
+            if (undefined != this.last_upload_list_hash[upload_list[i].name_hash]) {
                 continue
             }
             new_upload_task.push(upload_list[i])
@@ -157,14 +203,14 @@ export default {
         //重置上次传输的列表文件hash
         this.last_upload_list_hash = []
         for (let i in last_upload) {
-            this.last_upload_list_hash[last_upload[i].hash] = 1
+            this.last_upload_list_hash[last_upload[i].name_hash] = 1
         }
     },
     //将文件移除上传列表
     removeFileFromUploadList: function (file) {
         //到列表中进行寻找
         for (let i in Vue.GLOBAL.transform_upload) {
-            if (Vue.GLOBAL.transform_upload[i].hash == file.hash) {
+            if (Vue.GLOBAL.transform_upload[i].name_hash == file.name_hash) {
                 Vue.GLOBAL.transform_upload.splice(i, 1)
                 return true
             }
@@ -234,18 +280,11 @@ export default {
                 }
             })
             .catch((error) => {
+                //用于测试
+                console.log(upload_file)
+                //如果计算hash是异步的话，在准备的时候就把分片分好，然后一口气上传完毕，减少异步模型的添加
                 this.updateFileTransObject(upload_file[i], {status: TRANS_STATUS_RUNNING, slice_trunk: Vue.GLOBAL.transform_chunk})
-                let slice_sum = Math.ceil(upload_file[i].size / upload_file[i].upload_task.slice_trunk)
-                for (let slice = 1; slice <= slice_sum; slice++) {
-                    let start_byte = upload_file[i].upload_task.slice_trunk * (slice - 1)
-                    let end_byte   = upload_file[i].upload_task.slice_trunk * slice - 1
-                    let file_slice = upload_file[i].slice(start_byte, end_byte)
-                    console.log(file_slice)
-                    let slice_hash = this.dataHash(file_slice)
-                    let fd = new FormData()
-                    fd.append('file', upload_file[i].slice(start_byte, end_byte))
 
-                }
 
 
                 console.log(error)
