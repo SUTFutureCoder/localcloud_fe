@@ -10,14 +10,6 @@ import FileCrypto from './FileCrypto'
 
 //上传触发
 let upload_trigger = false
-//文件传输对象模板
-const TRANS_TASK_OBJECT_TPL = {
-    status:     -1,
-    progress:   0.0,
-    slice_trunk:   0,   //分片大小
-    slice_current: 0,   //当前分片
-    slice_sum:  0,      //分片总数
-}
 //status常量
 const TRANS_STATUS_PREPARE = -1     //准备中 通常计算hash中
 const TRANS_STATUS_PENDING = 0      //等待
@@ -49,8 +41,11 @@ export default {
                 upload_trans_cron_id = 0
             }
         }))
-        //用于接受hash
-        // Vue.$on('file_hash')
+
+        //用于消息控制序列分片上传
+        Vue.$on('file_slice_upload', (file_hash) => {
+            this.startSliceUpload(file_hash)
+        })
     },
 
     //上传主流程，因为不依赖其他的数据源，所以注意判断 直接传就可以
@@ -72,24 +67,10 @@ export default {
         }
 
         //到这里才进行遍历可进行的上传列表
-        this.startTransUploadTask(new_upload_task)
+        this.transUploadRequestion(new_upload_task)
 
         //往上次处理的列表添加hash
         this.setLastUploadListHash(tmp_upload_list)
-    },
-    //分割文件至上传分块
-    sliceFileToTruck: function () {
-        let slice_sum = Math.ceil(upload_file[i].size / upload_file[i].upload_task.slice_trunk)
-        for (let slice = 1; slice <= slice_sum; slice++) {
-            let start_byte = upload_file[i].upload_task.slice_trunk * (slice - 1)
-            let end_byte   = upload_file[i].upload_task.slice_trunk * slice
-            let file_slice = upload_file[i].slice(start_byte, end_byte)
-            console.log(file_slice)
-            // let slice_hash = this.dataHash(file_slice)
-            let fd = new FormData()
-            fd.append('file', upload_file[i].slice(start_byte, end_byte))
-
-        }
     },
 
     //用于计算文件名称HASH值，保证文件大概率上传列表唯一性。注意不要使用此方法进行Hash计算
@@ -120,7 +101,13 @@ export default {
     //批量初始化文件传输object,同时预分片
     initFileTransObject: function (files) {
         for (let i in files){
-            let tmp_task_obj = TRANS_TASK_OBJECT_TPL
+            let tmp_task_obj = {
+                status:     TRANS_STATUS_PREPARE,
+                progress:   0.0,
+                slice_trunk:   0,   //分片大小
+                slice_current: 0,   //当前分片
+                slice_sum:  0,      //分片总数
+            }
             //对文件进行预分片
             tmp_task_obj.slice_trunk = Vue.GLOBAL.transform_chunk
             tmp_task_obj.slice_sum = Math.ceil(files[i].size / Vue.GLOBAL.transform_chunk)
@@ -147,11 +134,9 @@ export default {
     checkFileIsReady: function () {
         for (let i in Vue.GLOBAL.transform_upload) {
             if (Vue.GLOBAL.transform_upload[i].upload_task.status == TRANS_STATUS_PREPARE) {
-                console.log(Vue.GLOBAL.transform_upload[i].hash)
                 if (undefined != Vue.GLOBAL.transform_upload[i].hash
                         && undefined != Vue.GLOBAL.transform_upload[i].slice_hash
                         && Vue.GLOBAL.transform_upload[i].slice_hash.length == Vue.GLOBAL.transform_upload[i].upload_task.slice_sum) {
-                    console.log('asdfasdfasdf')
                     //准备就绪
                     //如果顺序错乱严重，则需要将这个元素放到任务队列末尾
                     let tmp = Vue.GLOBAL.transform_upload[i]
@@ -217,14 +202,14 @@ export default {
         }
         return false
     },
-    //开始执行上传主任务
-    startTransUploadTask: function (upload_file) {
+    //上传请求
+    transUploadRequestion: function (upload_file) {
         for (let i in upload_file) {
             //初始化任务
-            Vue.$http.post('/file/upload/requestion', {
-                token: Vue.GLOBAL.user_token,
-                status: 1,
-                // hash:  upload_file[i].hash,
+            Vue.$http.post('/upload/requestion', {
+                hash: upload_file[i].hash,
+                size: upload_file[i].size,
+                position: '/'   //暂定根
             })
             .then((ret) => {
                 try {
@@ -245,32 +230,13 @@ export default {
                     }
 
                     //修改状态
-                    if (false == this.updateFileTransObject(upload_file[i], {status: TRANS_STATUS_RUNNING, slice_trunk: Vue.GLOBAL.transform_chunk})){
+                    if (false == this.updateFileTransObject(upload_file[i], {status: TRANS_STATUS_RUNNING})){
                         console.log('文件在队列中不存在')
                         return false
                     }
 
-                    //从这里如果获得了上传用token则开始各个文件自己的上传操作 第一版先不管token
-                    //进行分片处理
-                    // let slice_sum = Math.ceil(upload_file[i].size / Vue.GLOBAL.transform_chunk)
-
-                    //开始上传
-                    Vue.$http.post('/file/upload/requestion', {
-                        token: Vue.GLOBAL.user_token,
-                        status: 1,
-                        // hash:  upload_file[i].hash,
-                    })
-                    .then((ret) => {
-
-                    })
-                    .catch((error) => {
-                        console.log(error)
-                        if (false == this.updateFileTransObject(upload_file[i], {status: TRANS_STATUS_EXCEPTION})){
-                            console.log('文件在队列中不存在')
-                            return false
-                        }
-                    })
-
+                    //开始第一区块上传，注意使用消息模型保证序列准确
+                    this.startSliceUpload(upload_file[i].hash)
                 } catch (err) {
                     console.log(err)
                     if (false == this.updateFileTransObject(upload_file[i], {status: TRANS_STATUS_EXCEPTION})){
@@ -280,23 +246,85 @@ export default {
                 }
             })
             .catch((error) => {
-                //用于测试
-                console.log(upload_file)
-                //如果计算hash是异步的话，在准备的时候就把分片分好，然后一口气上传完毕，减少异步模型的添加
-                this.updateFileTransObject(upload_file[i], {status: TRANS_STATUS_RUNNING, slice_trunk: Vue.GLOBAL.transform_chunk})
-
-
-
                 console.log(error)
                 if (false == this.updateFileTransObject(upload_file[i], {status: TRANS_STATUS_EXCEPTION})){
                     console.log('文件在队列中不存在')
                     return false
                 }
             })
-
         }
+    },
+    //进行分片上传，这样传值能够保证消息总线数据量降低，并且降低各种判断问题
+    startSliceUpload: function (file_hash) {
+        //如果最后一个接收完毕，则停止消息发送
+        //找到那个文件
+        for (let i in Vue.GLOBAL.transform_upload) {
+            if (file_hash == Vue.GLOBAL.transform_upload[i].hash) {
+                let start_byte = Vue.GLOBAL.transform_upload[i].upload_task.slice_current * Vue.GLOBAL.transform_upload[i].upload_task.slice_trunk
+                let end_byte   = Vue.GLOBAL.transform_upload[i].upload_task.slice_current * Vue.GLOBAL.transform_upload[i].upload_task.slice_trunk
+                let fd = new FormData()
+                fd.append('file', Vue.GLOBAL.transform_upload[i].slice(start_byte, end_byte))
+                fd.append('hash', Vue.GLOBAL.transform_upload[i].hash)
+                fd.append('size', Vue.GLOBAL.transform_upload[i].size)
+                fd.append('position', '/')  //暂定为根
+                fd.append('slice_hash', Vue.GLOBAL.transform_upload[i].slice_hash[Vue.GLOBAL.transform_upload[i].upload_task.slice_current])
+                fd.append('last_modified', Vue.GLOBAL.transform_upload[i].lastModified)
+                fd.append('name', Vue.GLOBAL.transform_upload[i].name)
+                fd.append('mime', Vue.GLOBAL.transform_upload[i].type)
+                let tmp_file = Vue.GLOBAL.transform_upload[i]
+                //读取进度后进行上传操作
+                Vue.$http.post('/upload/exec', fd)
+                    .then((ret) => {
+                        try {
+                            //检查返回值
+                            if (ret['error_no'] != 0) {
+                                if (ret['error_msg'] != ""){
+                                    alert(ret['error_msg'])
+                                    throw ret['error_msg'];
+                                }
+                                return;
+                            }
 
+                            //检查是否已经完成了所有的块
+                            let tmp_slice_current = tmp_file.upload_task.slice_current + 1
+                            if (tmp_slice_current == tmp_file.upload_task.slice_sum) {
+                                //完成了所有的块，删除任务
+                                this.removeFileFromUploadList(tmp_file)
+                                return true
+                            }
+
+                            //修改状态
+                            let tmp_progress = tmp_slice_current / tmp_file.upload_task.slice_sum
+                            let tmp_progress_fixed = tmp_progress.toFixed(2)
+                            if (false == this.updateFileTransObject(tmp_file,
+                                    {
+                                        status: TRANS_STATUS_RUNNING,
+                                        progress: tmp_progress_fixed,
+                                        slice_current: tmp_slice_current,
+                                    })){
+                                console.log('文件在队列中不存在')
+                                return false
+                            }
+
+                            //发送消息，上传下一块
+                            Vue.$emit('file_slice_upload', tmp_file.hash)
+                        } catch (err) {
+                            console.log(err)
+                            if (false == this.updateFileTransObject(tmp_file, {status: TRANS_STATUS_EXCEPTION})){
+                                console.log('文件在队列中不存在')
+                                return false
+                            }
+                        }
+                    })
+                    .catch((error) => {
+                        console.log(error)
+                        if (false == this.updateFileTransObject(tmp_file, {status: TRANS_STATUS_EXCEPTION})){
+                            console.log('文件在队列中不存在')
+                            return false
+                        }
+                    })
+            }
+        }
     }
-
 
 }
