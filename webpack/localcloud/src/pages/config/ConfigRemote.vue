@@ -52,32 +52,31 @@
                             } else {
                                 alert('连接失败，请确认ip和端口是否正确')
                             }
-                            vue.GLOBAL.remote_host = vue.GLOBAL.remote_port = ""
+                            Bus.GLOBAL.remote_host = Bus.GLOBAL.remote_port = ""
                             return;
                         }
                         //记录该连接方式下配置
-                        vue.GLOBAL.remote_proto = this.remote_proto
-                        vue.GLOBAL.remote_host  = this.remote_host
-                        vue.GLOBAL.remote_port  = this.remote_port
-
+                        Bus.GLOBAL.remote_proto = this.remote_proto
+                        Bus.GLOBAL.remote_host  = this.remote_host
+                        Bus.GLOBAL.remote_port  = this.remote_port
                         //记录用户token
-                        vue.GLOBAL.user_token   = ret['data']['token']
+                        Bus.GLOBAL.user_token   = ret['data']['token']
 
-                        vue.$http = axios.create({
-                            baseURL: vue.GLOBAL.remote_proto + '://' + vue.GLOBAL.remote_host + ':' + vue.GLOBAL.remote_port + '/',
+                        Bus.$http = axios.create({
+                            baseURL: Bus.GLOBAL.remote_proto + '://' + Bus.GLOBAL.remote_host + ':' + vue.GLOBAL.remote_port + '/',
                             timeout: 5000,
                         })
-                        axiosRetry(vue.$http, { retries: 3 })
+                        axiosRetry(Bus.$http, { retries: 3 })
 
                         //以后不用拼接即可
 
                          StorageService.storageRemoteConnConfig({
-                             wifi    :   vue.GLOBAL.device_info.wifi,
-                             ssid    :   vue.GLOBAL.device_info.ssid,
-                             token   :   vue.GLOBAL.device_info.token,
-                             proto   :   vue.GLOBAL.remote_proto,
-                             host    :   vue.GLOBAL.remote_host,
-                             port    :   vue.GLOBAL.remote_port,
+                             wifi    :   Bus.GLOBAL.device_info.wifi,
+                             ssid    :   Bus.GLOBAL.device_info.ssid,
+                             token   :   Bus.GLOBAL.device_info.token,
+                             proto   :   Bus.GLOBAL.remote_proto,
+                             host    :   Bus.GLOBAL.remote_host,
+                             port    :   Bus.GLOBAL.remote_port,
                          })
 
                         //完成设置
@@ -86,7 +85,7 @@
                     })
                     .catch(function (response) {
                         alert('连接失败，请确认ip和端口是否正确')
-                        vue.GLOBAL.remote_host = vue.GLOBAL.remote_port = ""
+                        Bus.GLOBAL.remote_host = Bus.GLOBAL.remote_port = ""
                         return
                     })
             }

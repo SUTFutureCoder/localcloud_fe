@@ -71,7 +71,7 @@ export default {
 
                 Vue.$http = axios.create({
                     baseURL: Vue.GLOBAL.remote_proto + '://' + Vue.GLOBAL.remote_host + ':' + Vue.GLOBAL.remote_port + '/',
-                    timeout: 5000,
+                    timeout: 500000,
                 })
                 axiosRetry(Vue.$http, { retries: 3 })
             })

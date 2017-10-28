@@ -65,7 +65,6 @@ export default {
             //如果没有需要执行的新上传任务，则跳过
             return true
         }
-
         //到这里才进行遍历可进行的上传列表
         this.transUploadRequestion(new_upload_task)
 
@@ -213,6 +212,7 @@ export default {
             })
             .then((ret) => {
                 try {
+                    ret = ret['data']
                     //检查返回值
                     if (ret['error_no'] != 0) {
                         if (ret['error_msg'] != ""){
@@ -261,9 +261,12 @@ export default {
         for (let i in Vue.GLOBAL.transform_upload) {
             if (file_hash == Vue.GLOBAL.transform_upload[i].hash) {
                 let start_byte = Vue.GLOBAL.transform_upload[i].upload_task.slice_current * Vue.GLOBAL.transform_upload[i].upload_task.slice_trunk
-                let end_byte   = Vue.GLOBAL.transform_upload[i].upload_task.slice_current * Vue.GLOBAL.transform_upload[i].upload_task.slice_trunk
+                let end_byte   = (Vue.GLOBAL.transform_upload[i].upload_task.slice_current + 1) * Vue.GLOBAL.transform_upload[i].upload_task.slice_trunk
                 let fd = new FormData()
                 fd.append('file', Vue.GLOBAL.transform_upload[i].slice(start_byte, end_byte))
+                fd.append('slice_current', Vue.GLOBAL.transform_upload[i].upload_task.slice_current)
+                fd.append('slice_sum', Vue.GLOBAL.transform_upload[i].upload_task.slice_sum)
+                fd.append('slice_trunk', Vue.GLOBAL.transform_upload[i].upload_task.slice_trunk)
                 fd.append('hash', Vue.GLOBAL.transform_upload[i].hash)
                 fd.append('size', Vue.GLOBAL.transform_upload[i].size)
                 fd.append('position', '/')  //暂定为根
@@ -276,6 +279,7 @@ export default {
                 Vue.$http.post('/upload/exec', fd)
                     .then((ret) => {
                         try {
+                            ret = ret['data']
                             //检查返回值
                             if (ret['error_no'] != 0) {
                                 if (ret['error_msg'] != ""){
